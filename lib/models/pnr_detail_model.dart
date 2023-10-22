@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'passenger_model.dart';
 
 class PnrDetailModel {
-  late String pnrNumber;
+  late String pnrNumber = "";
   late DateTime doj;
   late String trainNumber;
   late String trainName;

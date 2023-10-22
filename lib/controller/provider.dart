@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:pnr_app/models/pnr_detail_model.dart';
@@ -10,20 +11,15 @@ final cookieProvider = StateNotifierProvider<CookieNotifier, String>((ref) {
 });
 
 final imgUrlProvider = StateProvider((ref) {
-  ref.read(cookieProvider.notifier).updateCookie();
+  ref.watch(cookieProvider);
   return generateImgUrl();
 });
 
 final pnrDetailProvider =
     StateNotifierProvider<SeatStatusNotifier, PnrDetailModel>((ref) {
   final cookie = ref.watch(cookieProvider);
-  final ans = ref.watch(ansProvider);
-  final pnr = ref.watch(pnrProvider);
-  return SeatStatusNotifier(cookie, pnr, ans);
+  return SeatStatusNotifier(cookie);
 });
-
-final pnrProvider = StateProvider<int>((ref) => 0);
-final ansProvider = StateProvider<int>((ref) => 0);
 
 class CookieNotifier extends StateNotifier<String> {
   CookieNotifier() : super('');
@@ -35,25 +31,20 @@ class CookieNotifier extends StateNotifier<String> {
 
 class SeatStatusNotifier extends StateNotifier<PnrDetailModel> {
   final String _cookie;
-  final int _pnrNumber;
-  final int _ans;
-  SeatStatusNotifier(this._cookie, this._pnrNumber, this._ans)
-      : super(PnrDetailModel());
+  SeatStatusNotifier(this._cookie) : super(PnrDetailModel());
 
-  void init() async {
-    await getData();
+  void init(int ans, int pnr) async {
+    await getData(ans, pnr);
   }
 
-  Future<void> getData() async {
+  Future<void> getData(int ans, int pnr) async {
     final Dio dio = Dio();
     final response = await dio.get(
-      "https://www.indianrail.gov.in/enquiry/CommonCaptcha?inputCaptcha=$_ans&inputPnrNo=$_pnrNumber&inputPage=PNR&language=en",
+      "https://www.indianrail.gov.in/enquiry/CommonCaptcha?inputCaptcha=$ans&inputPnrNo=$pnr&inputPage=PNR&language=en",
       options: Options(
           headers: {"Cookie": _cookie, "Host": "www.indianrail.gov.in"}),
     );
     final data = response.data;
-    print(response.statusCode);
-    // print(data);
     state = PnrDetailModel.fromJSON(data);
   }
 }
@@ -78,7 +69,6 @@ class PnrHistoryNotifier extends StateNotifier<List<PnrHistoryModel>> {
       await pnrHistory.filter().pnrNumEqualTo(pnrNum).deleteAll();
       await isarDB.pnrHistoryModels.put(newRecord);
     });
-    print("Object save");
   }
 
   void streamDB() async {
@@ -93,4 +83,11 @@ class PnrHistoryNotifier extends StateNotifier<List<PnrHistoryModel>> {
 
 final pnrHistoryList =
     StateNotifierProvider<PnrHistoryNotifier, List<PnrHistoryModel>>(
-        (ref) => PnrHistoryNotifier());
+  (ref) => PnrHistoryNotifier(),
+);
+
+final pnrTextEditingController =
+    StateProvider((ref) => TextEditingController());
+
+final ansTextEditingController =
+    StateProvider((ref) => TextEditingController());

@@ -14,9 +14,13 @@ class PnrTextBox extends ConsumerStatefulWidget {
 }
 
 class _PnrTextBoxWidget extends ConsumerState<PnrTextBox> {
+  TextEditingController? pnrTextController;
+  TextEditingController? ansTextController;
   @override
   void initState() {
     ref.read(cookieProvider.notifier).updateCookie();
+    pnrTextController = ref.read(pnrTextEditingController);
+    ansTextController = ref.read(ansTextEditingController);
     super.initState();
   }
 
@@ -42,10 +46,11 @@ class _PnrTextBoxWidget extends ConsumerState<PnrTextBox> {
           children: [
             TextField(
               keyboardType: TextInputType.phone,
-              onChanged: (value) {
-                ref.read(pnrProvider.notifier).state =
-                    value == "" ? 0 : int.parse(value);
-              },
+              controller: pnrTextController,
+              // onChanged: (value) {
+              //   ref.read(pnrProvider.notifier).state =
+              //       value == "" ? 0 : int.parse(value);
+              // },
               decoration: const InputDecoration(
                 hintText: "Enter your PNR",
                 enabledBorder: UnderlineInputBorder(
@@ -106,9 +111,10 @@ class _PnrTextBoxWidget extends ConsumerState<PnrTextBox> {
                   flex: 1,
                   child: TextField(
                     decoration: const InputDecoration(hintText: "Answer"),
-                    onChanged: (value) {
-                      ref.read(ansProvider.notifier).state = int.parse(value);
-                    },
+                    controller: ansTextController,
+                    // onChanged: (value) {
+                    //   ref.read(ansProvider.notifier).state = int.parse(value);
+                    // },
                   ),
                 ),
               ],
@@ -120,9 +126,13 @@ class _PnrTextBoxWidget extends ConsumerState<PnrTextBox> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
+                  if (pnrTextController!.text == "" ||
+                      ansTextController!.text == "") {
+                    return;
+                  }
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const PnrStatusPage(),
+                      builder: (context) => PnrStatusPage(UniqueKey()),
                     ),
                   );
                 },

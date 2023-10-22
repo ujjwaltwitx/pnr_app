@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pnr_app/controller/provider.dart';
-// import 'package:pnr_app/controller/provider.dart';
 
 class PnrHistoryWidget extends ConsumerStatefulWidget {
   const PnrHistoryWidget({super.key});
@@ -49,32 +48,38 @@ class _PnrHistoryState extends ConsumerState<PnrHistoryWidget> {
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 20),
-                      margin: const EdgeInsets.only(top: 1),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "${list[index].pnrNum}",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.blue,
+                    return GestureDetector(
+                      onTap: () {
+                        ref.read(pnrTextEditingController).text =
+                            list[index].pnrNum.toString();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 20),
+                        margin: const EdgeInsets.only(top: 1),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "${list[index].pnrNum}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.blue,
+                              ),
                             ),
-                          ),
-                          Text(
-                            "${list[index].source} - ${list[index].destination}",
-                            style: const TextStyle(
-                                color: Color.fromARGB(164, 0, 0, 0)),
-                          ),
-                        ],
+                            Text(
+                              "${list[index].source} - ${list[index].destination}",
+                              style: const TextStyle(
+                                  color: Color.fromARGB(164, 0, 0, 0)),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
